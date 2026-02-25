@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="EjemploInteractivoAutomatico/EjemploInteractivoAutomatico.Client/EjemploInteractivoAutomatico.Client.csproj" />
+  <Project Path="EjemploInteractivoAutomatico/EjemploInteractivoAutomatico/EjemploInteractivoAutomatico.csproj" />
+</Solution>

@@ -1,0 +1,23 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hola mundo 2</h1>
+
+Welcome to your new app.
+
+<hr />
+
+<button @onclick="CambiarMensaje">Presióname</button>
+<button onclick="alert('He sido presionado')">Presióname alerta</button>
+
+<p>Mensaje: @mensaje</p>
+
+@code {
+    string mensaje = "Un mensaje";
+
+    void CambiarMensaje()
+    {
+        mensaje = "Otro mensaje";
+    }
+}
