@@ -1,0 +1,45 @@
+﻿@page "/bucles"
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<h3>Listado de personas:</h3>
+
+<ul>
+    @foreach (var persona in personas)
+    {
+        <li>@persona.Nombre - @persona.FechaNacimiento.ToString("dd/MM/yyyy")</li>
+    }
+</ul>
+
+<h3>Listado de personas (con for):</h3>
+
+<ul>
+    @for (var i = 0; i < personas.Count; i++)
+    {
+        <li>
+            @personas[i].Nombre = @personas[i].FechaNacimiento.ToString("dd/MM/yyyy")
+        </li>
+    }
+</ul>
+
+<h3>Contar del 1 al 10</h3>
+
+<ul>
+    @for (int i = 1; i <= 10; i++)
+    {
+        <li>@i</li>
+    }
+</ul>
+
+@code {
+    List<Persona> personas = new List<Persona>()
+        {
+            new Persona("Felipe", new DateTime(1900, 04, 5)),
+            new Persona("Claudia", new DateTime(1947, 12, 19)),
+            new Persona("Ricardo", new DateTime(2010, 01, 21)),
+        };
+
+
+    public record Persona(string Nombre, DateTime FechaNacimiento);
+}

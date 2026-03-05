@@ -1,0 +1,12 @@
+﻿@page "/parametros-cascada-ejemplo"
+@rendermode InteractiveServer
+
+<h3 style="color: @AppState.Color">ParametroCascadaEjemplo</h3>
+
+<MuestraColor />
+
+<CambiaColor />
+
+@code {
+    [CascadingParameter] private AppState AppState { get; set; } = null!;
+}

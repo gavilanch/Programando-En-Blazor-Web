@@ -1,0 +1,29 @@
+﻿@page "/counter"
+@using BlazorPeliculas.Components.Pages.Ejemplos
+@rendermode InteractiveServer
+
+<PageTitle>Counter (@currentCount)</PageTitle>
+
+<div>
+    <h1>Counter</h1>
+
+    <Header1></Header1>
+</div>
+<p role="status">Current count: @currentCount</p>
+
+<p>Singleton count: @singleton.Valor</p>
+
+@* <SectionContent SectionName="top-bar">
+    <p>Singleton count: @singleton.Valor</p>
+</SectionContent> *@
+
+
+<p>Transient count: @transient.Valor</p>
+<p>Scoped count: @scoped2.Valor</p>
+
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="IncrementCountJavaScript">Click me JavaScript</button>
+
+<ListadoPeliculas Peliculas="futurosEstrenos" />
+

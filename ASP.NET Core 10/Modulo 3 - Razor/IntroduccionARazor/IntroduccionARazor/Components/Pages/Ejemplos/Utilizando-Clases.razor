@@ -1,0 +1,18 @@
+﻿@page "/utilizando-clases"
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<p>El mensaje es: @UtilidadesString.VolverMayusculas(mensaje)!</p>
+
+<p>La suma de 2 y 3 es @(2 + 3)</p>
+
+<button @onclick="@(() => Console.WriteLine("Me han clickeado"))">Presióname</button>
+
+@code {
+    string mensaje = "Este es un mensaje";
+}

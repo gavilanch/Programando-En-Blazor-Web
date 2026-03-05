@@ -1,0 +1,19 @@
+﻿@inject AppStateService appStateService
+
+Cambia el color:
+<select @bind:get="@AppState.Color" 
+@bind:set="@((nuevoValor) => CambiarColor(nuevoValor))" class="form-select">
+    <option value="green">Verde</option>
+    <option value="red">Rojo</option>
+</select>
+
+
+@code {
+    [CascadingParameter] private AppState AppState { get; set; } = null!;
+
+    public async Task CambiarColor(string valor)
+    {
+        AppState.Color = valor;
+        await appStateService.NotifyChangedAsync();
+    }
+}

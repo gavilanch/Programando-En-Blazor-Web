@@ -1,0 +1,52 @@
+﻿@page "/bind-after"
+@rendermode InteractiveServer
+
+<h3>Bind After</h3>
+
+<input @bind="busqueda" @bind:after="Buscar" @bind:event="oninput" />
+
+@if (!string.IsNullOrEmpty(busqueda))
+{
+    if (cargando)
+    {
+        <p>
+            <Cargando />
+        </p>
+    }
+    else
+    {
+        <p>Personas encontradas:</p>
+        <ul>
+            @foreach (var persona in personasEncontradas)
+            {
+                <li @key="persona">@persona</li>
+            }
+        </ul>
+    }
+}
+
+@code {
+    private string busqueda = string.Empty;
+    private List<string> personasEncontradas = [];
+    private bool cargando = false;
+
+    private async Task Buscar()
+    {
+        cargando = true;
+        var personas = new List<string>
+        {
+            "Felipe Gavilán",
+            "Felipe Díaz",
+            "Claudia Rodríguez",
+            "Claudia Celeste"
+        };
+
+        await Task.Delay(TimeSpan.FromSeconds(1));
+
+        personasEncontradas = personas.Where(p => p.Contains(busqueda,
+                    StringComparison.InvariantCultureIgnoreCase)).ToList();
+        cargando = false;
+
+    }
+
+}

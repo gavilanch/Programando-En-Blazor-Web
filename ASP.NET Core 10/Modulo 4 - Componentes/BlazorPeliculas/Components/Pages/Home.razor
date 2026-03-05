@@ -1,0 +1,73 @@
+﻿@page "/"
+@attribute [StreamRendering]
+@rendermode InteractiveServer
+@inject ServicioSingleton singleton
+@inject IServicioPeliculas servicioPeliculas
+
+<PageTitle>Home 2</PageTitle>
+
+<HeadContent>
+    <meta name="description" content="Página para visualizar películas" />
+</HeadContent>
+
+<p>Singleton count: @singleton.Valor</p>
+
+<BPBoton id="mi-boton" name="mi-boton" class="p-3" OnClick="ManejarClick" />
+<BPBoton OnClick="@(() => ManejarClick("Clickeaste el botón 2"))">
+    Mi texto personalizado
+</BPBoton>
+
+
+<hr />
+
+<input type="checkbox" @bind="mostrarPeliculas" />
+Mostrar Películas
+
+@if (mostrarPeliculas)
+{
+    <BPBoton OnClick="LimpiarPeliculas">
+        Limpiar Películas en cartelera
+    </BPBoton>
+
+
+    <h3>En Cartelera</h3>
+    <ListadoPeliculas Peliculas="enCartelera" @ref="listadoPeliculas" />
+
+    <h3>Futuros Estrenos</h3>
+    <ListadoPeliculas Peliculas="futurosEstrenos" />
+}
+
+@code {
+    private bool mostrarPeliculas = true;
+    private ListadoPeliculas? listadoPeliculas;
+
+    public void LimpiarPeliculas() => listadoPeliculas?.LimpiarPeliculas();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        Console.WriteLine("OnAfterRenderAsync");
+        await Task.Delay(TimeSpan.FromSeconds(2));
+
+        enCartelera = servicioPeliculas.ObtenerPeliculas();
+        futurosEstrenos = servicioPeliculas.ObtenerPeliculas();
+
+        StateHasChanged();
+
+    }
+
+    private void ManejarClick()
+    {
+        Console.WriteLine("Evento desde el componente padre");
+        mostrarPeliculas = !mostrarPeliculas;
+    }
+
+    private void ManejarClick(string mensaje) => Console.WriteLine(mensaje);
+
+    private List<Pelicula>? enCartelera = null;
+    private List<Pelicula>? futurosEstrenos = null;
+}

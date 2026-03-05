@@ -1,0 +1,68 @@
+﻿@page "/"
+@attribute [StreamRendering]
+
+<PageTitle>Home</PageTitle>
+
+<h3>Listado de personas:</h3>
+
+@if (personas is null)
+{
+    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?_=20151024034921" />
+}
+else
+{
+    <ul>
+        @foreach (var persona in personas)
+        {
+            <li>
+                @persona.Nombre - @persona.FechaNacimiento.ToString("dd/MM/yyyy") -
+                @switch (persona.Calificacion)
+                {
+                    case Calificacion.A:
+                        <text>Felicidades, excelente calificación</text>
+                        break;
+                    case Calificacion.B:
+                        <text>Bien hecho!</text>
+                        break;
+                    case Calificacion.C:
+                        <text>Lo has logrado!</text>
+                        break;
+                    case Calificacion.D:
+                        <text>Debes esforzarte más!</text>
+                        break;
+                    case Calificacion.F:
+                        <text>Nos vemos el año próximo!</text>
+                        break;
+                    default:
+                        <text>Calificación desconocida</text>
+                        break;
+                }
+
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    List<Persona>? personas = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(3000);
+
+        personas = new List<Persona>()
+        {
+            new Persona("Felipe", new DateTime(1900, 04, 5), Calificacion.F),
+            new Persona("Claudia", new DateTime(1947, 12, 19), Calificacion.A),
+            new Persona("Ricardo", new DateTime(2010, 01, 21), Calificacion.C),
+        };
+
+    }
+
+    public record Persona(string Nombre, DateTime FechaNacimiento, Calificacion Calificacion);
+
+    public enum Calificacion
+    {
+        A, B, C, D, E, F
+    }
+}
