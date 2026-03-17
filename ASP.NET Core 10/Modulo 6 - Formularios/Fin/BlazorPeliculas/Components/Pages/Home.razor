@@ -1,0 +1,24 @@
+﻿@page "/"
+@page "/index"
+@attribute [StreamRendering]
+@inject IServicioPeliculas servicioPeliculas
+
+<PageTitle>Home</PageTitle>
+
+<h3>En Cartelera</h3>
+<ListadoPeliculas Peliculas="enCartelera" />
+
+<h3>Futuros Estrenos</h3>
+<ListadoPeliculas Peliculas="futurosEstrenos" />
+
+@code {
+    protected override void OnInitialized()
+    {
+
+        enCartelera = servicioPeliculas.ObtenerPeliculas();
+        futurosEstrenos = servicioPeliculas.ObtenerPeliculas();
+    }
+
+    private List<Pelicula>? enCartelera = null;
+    private List<Pelicula>? futurosEstrenos = null;
+}

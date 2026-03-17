@@ -1,0 +1,18 @@
+﻿@page "/bind-get-set"
+@rendermode InteractiveServer
+
+<input @bind:get="valor" @bind:set="SetAsync" @bind:event="oninput" />
+
+<p>
+    El valor es: @valor
+</p>
+
+@code {
+    string valor = string.Empty;
+
+    private Task SetAsync(string texto)
+    {
+        valor = texto.ToUpper();
+        return Task.CompletedTask;
+    }
+}

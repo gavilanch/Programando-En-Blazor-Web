@@ -1,0 +1,44 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">BlazorPeliculas</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="generos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Géneros
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="actores">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Actores
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="peliculas/crear">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Crear Película
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="peliculas/buscar">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Buscar Películas
+            </NavLink>
+        </div>
+
+
+    </nav>
+</div>
+

@@ -1,0 +1,89 @@
+﻿@using BlazorPeliculas.Utilidades
+@inject IJSRuntime JS
+
+
+<ListadoGenerico Listado="peliculas">
+    <ErrorBoundary>
+        <ChildContent>
+            <PeliculaIndividual @key="context.Id" Pelicula="context"
+                                EliminarPelicula="EliminarPelicula" />
+        </ChildContent>
+        <ErrorContent Context="error">
+            <hr />
+                La película no pudo ser cargada...
+            <hr />
+        </ErrorContent>
+    </ErrorBoundary>
+</ListadoGenerico>
+
+@code {
+    [Parameter, EditorRequired] public List<Pelicula>? Peliculas { get; set; }
+    private bool shouldRender = true;
+    private int cantidadPeliculasAnterior = -1;
+
+    private List<Pelicula> peliculas { get; set; } = null!;
+
+    public void LimpiarPeliculas() => peliculas?.Clear();
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("OnInitialized");
+        peliculas = Peliculas!;
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("OnParametersSet");
+        peliculas = Peliculas!;
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        Console.WriteLine("SetParametersAsync");
+
+        shouldRender = false;
+
+        if (parameters.TryGetValue<List<Pelicula>>(nameof(Peliculas), out var nuevasPeliculas))
+        {
+            if (nuevasPeliculas is not null)
+            {
+                if (cantidadPeliculasAnterior != nuevasPeliculas.Count)
+                {
+                    shouldRender = true;
+                    cantidadPeliculasAnterior = nuevasPeliculas.Count;
+                }
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"OnAfterRenderAsync: {firstRender}");
+        Console.ForegroundColor = ConsoleColor.White;
+
+    }
+
+    // protected override bool ShouldRender()
+    // {
+    //     Console.WriteLine("Should render");
+    //     return shouldRender;
+    // }
+
+
+    private async Task EliminarPelicula(Pelicula pelicula)
+    {
+        var mensaje = $"¿Desea borrar la película {pelicula.Titulo}?";
+        var confirmado = await JS.Confirm(mensaje);
+
+        if (confirmado)
+        {
+            shouldRender = true;
+            peliculas!.Remove(pelicula);
+            cantidadPeliculasAnterior = peliculas.Count;
+        }
+
+    }
+}

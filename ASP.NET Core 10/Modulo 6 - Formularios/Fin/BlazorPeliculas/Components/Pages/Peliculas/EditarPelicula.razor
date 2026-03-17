@@ -1,0 +1,88 @@
+﻿@page "/peliculas/editar/{Id:int}"
+@inject NavigationManager navigationManager
+
+<h3>Editar Película</h3>
+
+@if (pelicula is null)
+{
+    <Cargando />
+} else
+{
+    <FormularioPelicula FormularioPosteadoConExito="formularioPosteadoConExito" 
+        PosteoEnCurso="posteoEnCurso"
+                        FormularioInvalido="false" OnValidSubmit="Editar" Pelicula="pelicula"
+                        GenerosNoSeleccionados="GenerosNoSeleccionados"
+                        GenerosSeleccionados="GenerosSeleccionados"
+                        ActoresSeleccionados="ActoresSeleccionados" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private bool formularioPosteadoConExito = false;
+    private bool posteoEnCurso = false;
+    private Pelicula pelicula = null!;
+
+    private List<Genero> GenerosNoSeleccionados = new List<Genero>();
+    private List<Genero> GenerosSeleccionados = new List<Genero>();
+    private List<Actor> ActoresSeleccionados = [];
+
+
+    protected override void OnInitialized()
+    {
+        pelicula = new()
+        {
+            Id = Id,
+            Titulo = "Peli 1",
+            FechaLanzamiento = new DateTime(2012, 05, 25),
+            EnCartelera = true,
+            Trailer = "abc",
+            PosterURL = "https://upload.wikimedia.org/wikipedia/en/2/2e/Inception_%282010%29_theatrical_poster.jpg"
+        };
+
+        GenerosNoSeleccionados = new List<Genero>()
+        {
+            new Genero(){Id = 1, Nombre = "Comedia"},
+            new Genero(){Id = 3, Nombre = "Acción"},
+            new Genero(){Id = 4, Nombre = "Sci-fi"},
+        };
+
+        GenerosSeleccionados = new List<Genero>()
+        {
+            new Genero{Id=2, Nombre = "Drama"}
+        };
+
+        ActoresSeleccionados = new()
+        {
+            new(){Id = 1, Nombre = "Tom Holland", Personaje = "Peter Parker", FotoURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg/500px-Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg"}
+        };
+
+    }
+
+    private async Task Editar()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+            Console.WriteLine("Ejecutando método Editar");
+            await Task.Delay(2000);
+            Console.WriteLine($"Titulo: {pelicula.Titulo}");
+            Console.WriteLine($"Fecha de lanzamiento: {pelicula.FechaLanzamiento}");
+            Console.WriteLine($"Hay imagen?: {pelicula.PosterArchivo is not null}");
+            Console.WriteLine($"En cartelera: {pelicula.EnCartelera}");
+
+            Console.WriteLine("--Generos--");
+            pelicula.GenerosPelicula.ForEach(x => Console.WriteLine(x.GeneroId));
+
+            Console.WriteLine("--Actores--");
+            pelicula.ActoresPelicula.ForEach(x => Console.WriteLine($"{x.ActorId} - {x.Personaje}"));
+
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();
+            navigationManager.NavigateTo($"/peliculas/{Id}");
+        }
+    }
+
+
+
+}

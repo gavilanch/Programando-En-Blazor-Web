@@ -1,0 +1,13 @@
+﻿<FormularioEntidad Entidad="Genero" FormularioPosteadoConExito="FormularioPosteadoConExito"
+    PosteoEnCurso="PosteoEnCurso" OnValidSubmit="OnValidSubmit"
+                   FormularioInvalido="FormularioInvalido">
+    <BPInputText Label="Nombre" @bind-Value="@Genero.Nombre" />
+</FormularioEntidad>
+
+@code {
+    [Parameter, EditorRequired] public Genero Genero { get; set; } = null!;
+    [Parameter, EditorRequired] public bool FormularioPosteadoConExito { get; set; } = false;
+    [Parameter, EditorRequired] public bool PosteoEnCurso { get; set; } = false;
+    [Parameter, EditorRequired] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public bool FormularioInvalido { get; set; } = true;
+}

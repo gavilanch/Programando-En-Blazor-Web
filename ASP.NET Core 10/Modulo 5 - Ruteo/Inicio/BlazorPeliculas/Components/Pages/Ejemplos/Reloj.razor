@@ -1,0 +1,29 @@
+﻿@page "/reloj"
+@rendermode InteractiveServer
+@implements IDisposable
+<h3>Reloj</h3>
+
+<p>@fechaActual.ToLongTimeString()</p>
+
+@code {
+    Timer timer = null!;
+    DateTime fechaActual = DateTime.Now;
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer(new TimerCallback(Elapsed), null, 0, 1000);
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+
+    private void Elapsed(object? state)
+    {
+        fechaActual = DateTime.Now;
+        Console.WriteLine(fechaActual.ToLongTimeString());
+        InvokeAsync(StateHasChanged);
+    }
+
+}

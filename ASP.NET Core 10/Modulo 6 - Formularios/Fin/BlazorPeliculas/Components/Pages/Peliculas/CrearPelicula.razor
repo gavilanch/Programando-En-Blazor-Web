@@ -1,0 +1,59 @@
+﻿@page "/peliculas/crear"
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<h3>Crear Película</h3>
+
+<FormularioPelicula FormularioPosteadoConExito="formularioPosteadoConExito" 
+    PosteoEnCurso="posteoEnCurso"
+                    OnValidSubmit="Crear" Pelicula="pelicula"
+                    GenerosNoSeleccionados="GenerosNoSeleccionados"/>
+
+
+@code {
+
+    private bool formularioPosteadoConExito = false;
+    private bool posteoEnCurso = false;
+    private Pelicula pelicula = null!;
+    private List<Genero> GenerosNoSeleccionados = new List<Genero>();
+
+    protected override void OnInitialized()
+    {
+        pelicula = new();
+
+        GenerosNoSeleccionados = new List<Genero>()
+        {
+            new Genero(){Id = 1, Nombre = "Comedia"},
+            new Genero(){Id = 2, Nombre = "Drama"},
+            new Genero(){Id = 3, Nombre = "Acción"},
+            new Genero(){Id = 4, Nombre = "Sci-fi"},
+        };
+
+    }
+
+
+    private async Task Crear()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+            Console.WriteLine("Ejecutando método Crear");
+            await Task.Delay(2000);
+            Console.WriteLine($"Titulo: {pelicula.Titulo}");
+            Console.WriteLine($"Fecha de lanzamiento: {pelicula.FechaLanzamiento}");
+            Console.WriteLine($"Hay imagen?: {pelicula.PosterArchivo is not null}");
+            Console.WriteLine($"En cartelera: {pelicula.EnCartelera}");
+
+            Console.WriteLine("--Generos--");
+            pelicula.GenerosPelicula.ForEach(x => Console.WriteLine(x.GeneroId));
+
+            Console.WriteLine("--Actores--");
+            pelicula.ActoresPelicula.ForEach(x => Console.WriteLine($"{x.ActorId} - {x.Personaje}"));
+
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();
+            navigationManager.NavigateTo("/peliculas");
+        }
+    }
+}

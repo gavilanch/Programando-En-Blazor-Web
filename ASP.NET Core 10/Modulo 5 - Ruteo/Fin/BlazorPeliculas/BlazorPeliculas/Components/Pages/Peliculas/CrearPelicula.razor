@@ -1,0 +1,15 @@
+﻿@page "/peliculas/crear"
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<h3>CrearPelicula</h3>
+
+<BPBoton OnClick="Crear">Crear película</BPBoton>
+
+@code {
+    void Crear()
+    {
+        // guardo la película en la base de datos...
+        navigationManager.NavigateTo("/peliculas");
+    }
+}

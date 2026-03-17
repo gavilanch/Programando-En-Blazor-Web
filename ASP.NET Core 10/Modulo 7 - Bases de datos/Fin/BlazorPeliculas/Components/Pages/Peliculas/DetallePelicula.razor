@@ -1,0 +1,99 @@
+﻿@page "/peliculas/{Id:int}"
+@page "/peliculas/{Id:int}/{NombrePelicula}"
+@using Microsoft.AspNetCore.WebUtilities
+@inject IServicioPeliculas servicioPeliculas
+@inject NavigationManager navigationManager
+
+@if (modelo is null)
+{
+    <Cargando />
+}
+else
+{
+    <div class="d-flex justify-content-between">
+        <h2>@modelo.Pelicula.Titulo (@modelo.Pelicula.FechaLanzamiento?.ToString("yyyy"))</h2>
+        <div>
+            <BPLink Href=@($"/peliculas/editar/{modelo.Pelicula.Id}")>Editar</BPLink>
+            <BPBoton OnClick="Borrar"
+                     MensajeConfirmacion="@($"¿Desea borrar la película {modelo.Pelicula.Titulo}?")"
+                Variante="Variante.Error">Borrar</BPBoton>
+        </div>
+    </div>
+
+    foreach (var genero in modelo.Generos)
+    {
+        <a class="me-2 badge bg-primary rounded-pill text-decoration-none"
+           href="peliculas/buscar?generoid=@genero.Id">@genero.Nombre</a>
+    }
+
+    <span>
+        | @modelo.Pelicula.FechaLanzamiento?.ToString("dd MMM yyyy")
+        | Promedio: @modelo.PromedioVotos.ToString("0.#")/5
+        | Tu voto: @modelo.VotoUsuario.ToString()
+    </span>
+
+    <div class="d-flex mt-2">
+        <span style="display: inline-block;" class="me-2">
+            <img src="@modelo.Pelicula.PosterURL" style="width: 225px; height: 315px" />
+        </span>
+
+        @if (!string.IsNullOrEmpty(modelo.Pelicula.Trailer))
+        {
+            <iframe style="width: 560px; height: 315px"
+                    src="@TransformarURLTrailer(modelo.Pelicula.Trailer)" title="YouTube video player"
+                    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        }
+    </div>
+
+    @if (modelo.Actores.Any())
+    {
+        <div class="mt-2">
+            <h3>Actores</h3>
+            <div class="d-flex flex-column">
+                @foreach (var actor in modelo.Actores)
+                {
+                    <div class="mb-2">
+                        <img style="width: 50px;" src="@actor.FotoURL" />
+                        <span style="display: inline-block; width: 200px">@actor.Nombre</span>
+                        <span style="display: inline-block; width: 45px">...</span>
+                        <span>@actor.Personaje</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string? NombrePelicula { get; set; }
+    private PeliculaDetalleDTO? modelo;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await Task.Yield();
+        modelo = await servicioPeliculas.ObtenerDetalle(Id);
+        StateHasChanged();
+    }
+
+    private string TransformarURLTrailer(string url)
+    {
+        var uri = new Uri(url);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        var id = query["v"].ToString();
+        return $"https://www.youtube.com/embed/{id}";
+    }
+
+    private async Task Borrar()
+    {
+        await servicioPeliculas.Borrar(Id);
+        navigationManager.NavigateTo("/");
+    }
+
+}
