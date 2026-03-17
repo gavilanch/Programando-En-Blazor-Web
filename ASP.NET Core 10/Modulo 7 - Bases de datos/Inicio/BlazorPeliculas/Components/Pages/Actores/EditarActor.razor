@@ -1,0 +1,51 @@
+﻿@page "/actores/editar/{Id:int}"
+@inject NavigationManager navigationManager
+
+<h3>Editar Actor</h3>
+
+@if (actor is null)
+{
+    <Cargando />
+}
+else
+{
+    <FormularioActor FormularioPosteadoConExito="formularioPosteadoConExito" 
+        PosteoEnCurso="posteoEnCurso"
+                     FormularioInvalido="false" OnValidSubmit="Editar" Actor="actor" />
+}
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private bool formularioPosteadoConExito = false;
+    private bool posteoEnCurso = false;
+    private Actor actor = null!;
+
+    protected override void OnInitialized()
+    {
+        actor = new() { Id = Id, Nombre = "Felipe", 
+            FechaNacimiento = new DateTime(1901, 05, 25), 
+            FotoURL = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg/960px-Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg"
+        };
+    }
+
+    private async Task Editar()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+            Console.WriteLine("Ejecutando método Editar");
+            await Task.Delay(2000);
+            Console.WriteLine($"Nombre del actor: {actor.Nombre}");
+            Console.WriteLine($"Fecha de nacimiento del actor: {actor.FechaNacimiento}");
+            Console.WriteLine($"¿Hay imagen?: {actor.FotoArchivo is not null}");
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();
+            navigationManager.NavigateTo("/actores");
+        }
+    }
+
+
+
+}

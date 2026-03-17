@@ -1,0 +1,50 @@
+﻿<button @attributes="AtributosAdicionales" type="@Tipo.ToString()" disabled="@Disabled"
+class="@ClaseCSS" @onclick="OnClick"
+>@ChildContent</button>
+
+@code {
+    // [Parameter] public required string Texto { get; set; } = "Enviar";
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public BotonTipo Tipo { get; set; } = BotonTipo.Button;
+    [Parameter] public Variante Variante { get; set; } = Variante.Primario;
+    [Parameter] public Tamaño Tamaño { get; set; } = Tamaño.Md;
+    [Parameter(CaptureUnmatchedValues = true)] 
+    public Dictionary<string, object>? AtributosAdicionales { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; } = @<text>Enviar</text>;
+
+    private string ClaseCSS
+    {
+        get
+        {
+            var clasesDeCSSPadre = string.Empty;
+
+            if (AtributosAdicionales is not null && AtributosAdicionales.ContainsKey("class"))
+            {
+                clasesDeCSSPadre = AtributosAdicionales["class"].ToString()!;
+            }
+
+            string[] clases = [
+                "btn",
+                Variante switch {
+                    Variante.Primario => "btn-primary",
+                    Variante.Secundario => "btn-secondary",
+                    Variante.Exitoso => "btn-success",
+                    Variante.Advertencia => "btn-warning",
+                    Variante.Error => "btn-danger",
+                    _ => "btn-primary"
+                },
+                Tamaño switch {
+                    Tamaño.Sm => "btn-sm",
+                    Tamaño.Md => "btn-md",
+                    Tamaño.Lg => "btn-lg",
+                    _ => "btn-md"
+                },
+                clasesDeCSSPadre
+            ];
+
+            // btn btn-primary btn-md
+            return string.Join(" ", clases);
+        }
+    }
+}
