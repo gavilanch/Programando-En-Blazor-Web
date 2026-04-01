@@ -1,0 +1,46 @@
+﻿@page "/actores/crear"
+@inject NavigationManager navigationManager
+@inject IServicioActores servicioActores
+
+<h3>Crear Actor</h3>
+
+<FormularioActor FormularioPosteadoConExito="formularioPosteadoConExito" 
+    PosteoEnCurso="posteoEnCurso"
+                 OnValidSubmit="Crear" Actor="actor" />
+
+
+@code {
+    private bool formularioPosteadoConExito = false;
+    private bool posteoEnCurso = false;
+    private Actor actor = null!;
+
+    protected override void OnInitialized()
+    {
+        actor = new();
+    }
+
+    private async Task Crear()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+
+            StateHasChanged();
+            await Task.Yield();
+
+            var browserFile = actor.FotoArchivo;
+
+            if (browserFile is not null)
+            {
+                actor.Archivo = browserFile.ConvertirAArchivoDTO();
+            }
+
+            await servicioActores.Crear(actor);
+
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();
+            navigationManager.NavigateTo("/actores");
+        }
+    }
+}

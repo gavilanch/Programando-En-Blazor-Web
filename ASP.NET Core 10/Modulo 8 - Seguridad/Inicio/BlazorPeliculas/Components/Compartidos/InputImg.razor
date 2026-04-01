@@ -1,0 +1,47 @@
+﻿@inject IJSRuntime JS
+
+<div class="mb-4">
+    <label for="@Id">@Label</label>
+    <div>
+        <InputFile id="@Id" OnChange="OnChange" accept=".jpg,.jpeg,.png" @ref="inputFile" />
+    </div>
+</div>
+
+<div>
+    @if (mostrarPreview)
+    {
+        <div>
+            <div style="margin: 10px">
+                <img @ref="previewImagen" />
+            </div>
+        </div>
+    }
+
+    @if (ImagenURL is not null)
+    {
+        <div>
+            <div style="margin: 10px">
+                <img src="@ImagenURL" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public string Label { get; set; } = "Imagen";
+    [Parameter] public string? ImagenURL { get; set; }
+    [Parameter] public EventCallback<IBrowserFile> ImagenSeleccionada { get; set; }
+    private InputFile? inputFile;
+    private ElementReference previewImagen;
+    private bool mostrarPreview = false;
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        ImagenURL = null;
+        mostrarPreview = true;
+        StateHasChanged();
+        await JS.InvokeVoidAsync("mostrarPreview", inputFile!.Element, previewImagen);
+        await ImagenSeleccionada.InvokeAsync(e.File);
+    }
+}

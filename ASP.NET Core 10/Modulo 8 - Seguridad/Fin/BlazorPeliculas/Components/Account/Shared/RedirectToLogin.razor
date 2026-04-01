@@ -1,0 +1,26 @@
+﻿@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<form action="Account/Logout" method="post" id="logout-form">
+    <AntiforgeryToken />
+    <input type="hidden" name="ReturnUrl" value="account/login" />
+</form>
+
+
+@code {
+    // protected override void OnInitialized()
+    // {
+    //     NavigationManager.NavigateTo($"Account/Login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}", forceLoad: true);
+    // }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await JS.InvokeVoidAsync("postearForm", "logout-form");
+    }
+
+}

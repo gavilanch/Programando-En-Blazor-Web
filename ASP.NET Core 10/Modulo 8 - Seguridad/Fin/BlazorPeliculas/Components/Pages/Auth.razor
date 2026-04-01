@@ -1,0 +1,70 @@
+﻿@page "/auth"
+@* @attribute [StreamRendering] *@
+@using Microsoft.AspNetCore.Authorization
+
+@* @attribute [Authorize] *@
+
+<PageTitle>Auth</PageTitle>
+
+<h1>@mensajeAutenticacion</h1>
+
+<hr />
+
+<AuthorizeView>
+    <Authorized>
+        Hello @context.User.Identity?.Name!
+
+        <hr />
+
+        Claims del usuario:
+
+        <ul>
+            @foreach (var claim in context.User.Claims)
+            {
+                <li>@claim.Type: @claim.Value</li>
+            }
+        </ul>
+
+        @if (tienePassword)
+        {
+            <p>El usuario se ha autenticado con cuenta propia usando un password.</p>
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        Usted no está autorizado
+    </NotAuthorized>
+    <Authorizing>
+        Autenticando...
+    </Authorizing>
+</AuthorizeView>
+
+@code {
+    private string mensajeAutenticacion = "Autenticando...";
+    private bool tienePassword = false;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(2000);
+        var authenticationState = await AuthenticationStateTask!;
+        var usuarioEstaAutenticado = authenticationState.User.Identity is not null 
+                                    && authenticationState.User.Identity.IsAuthenticated;
+
+        mensajeAutenticacion = usuarioEstaAutenticado ? "Usted está autenticado" : "Usted no está autenticado";
+
+        if (usuarioEstaAutenticado)
+        {
+            // Nota: esto se puede hacer con policy (lo veremos más adelante)
+            var claimAMR = authenticationState.User.Claims.FirstOrDefault(c => c.Type == "amr");
+
+            if (claimAMR is not null && claimAMR.Value == "pwd")
+            {
+                tienePassword = true;
+            }
+        }
+
+    }
+}

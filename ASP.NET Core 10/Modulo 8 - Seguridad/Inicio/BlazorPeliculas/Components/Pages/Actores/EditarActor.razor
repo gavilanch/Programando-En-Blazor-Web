@@ -1,0 +1,70 @@
+﻿@page "/actores/editar/{Id:int}"
+@inject NavigationManager navigationManager
+@inject IServicioActores servicioActores
+
+<h3>Editar Actor</h3>
+
+@if (actor is null)
+{
+    <Cargando />
+}
+else
+{
+    <FormularioActor FormularioPosteadoConExito="formularioPosteadoConExito" 
+        PosteoEnCurso="posteoEnCurso"
+                     FormularioInvalido="false" OnValidSubmit="Editar" Actor="actor" />
+}
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private bool formularioPosteadoConExito = false;
+    private bool posteoEnCurso = false;
+    private Actor? actor = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+         actor = await servicioActores.ObtenerPorId(Id);
+
+        if (actor is null)
+        {
+            navigationManager.NavigateTo("/actores");
+        }
+
+        StateHasChanged();
+
+    }
+
+    private async Task Editar()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+
+            StateHasChanged();
+            await Task.Yield();
+           
+            var browserFile = actor!.FotoArchivo;
+
+            if (browserFile is not null)
+            {
+                actor.Archivo = browserFile.ConvertirAArchivoDTO();
+            }
+
+            await servicioActores.Actualizar(actor!);
+
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();
+            navigationManager.NavigateTo("/actores");
+        }
+    }
+
+
+
+}

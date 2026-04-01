@@ -1,0 +1,30 @@
+﻿@typeparam T
+
+@if (Listado is null)
+{
+    @Cargando   
+} else if (Listado.Count() == 0)
+{
+    @NoHayRegistros
+} else
+{
+    if (ChildContent is not null)
+    {
+       foreach (var elemento in Listado)
+        {
+            @ChildContent(elemento)
+        }
+    } else
+    {
+        @HayRegistrosCompleto
+    }
+
+}
+
+@code {
+    [Parameter, EditorRequired] public IEnumerable<T> Listado { get; set; }
+    [Parameter] public RenderFragment? Cargando { get; set; } = @<Cargando />;
+    [Parameter] public RenderFragment? NoHayRegistros { get; set; } = @<text>No existen películas para mostrar...</text>;
+    [Parameter] public RenderFragment<T>? ChildContent { get; set; } = null!;
+    [Parameter] public RenderFragment? HayRegistrosCompleto { get; set; }
+}

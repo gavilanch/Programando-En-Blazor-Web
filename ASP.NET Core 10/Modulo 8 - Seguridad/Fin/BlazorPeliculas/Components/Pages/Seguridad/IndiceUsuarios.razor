@@ -1,0 +1,99 @@
+﻿@page "/usuarios"
+@using BlazorPeliculas.Constantes
+@inject IServicioSeguridad servicioSeguridad
+@attribute [Authorize(Policy = "PuedeEditarRoles")]
+@inject NavigationManager navigationManager
+
+<h3>Indice Usuarios</h3>
+
+<ListadoGenerico Listado=@usuarios>
+    <HayRegistrosCompleto>
+        <Paginacion PaginaActual="paginaActual"
+                    CantidadTotalRegistros="cantidadTotalRegistros"
+                    RegistrosPorPagina="registrosPorPagina"
+                    PaginaSeleccionada="PaginaSeleccionada"></Paginacion>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Nombre</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var usuario in usuarios!)
+                {
+                    <tr @key="usuario.Id">
+                        <td>
+                            <BPBoton OnClick="() => HacerAdmin(usuario.Email)"
+                                     Variante="Variante.Primario"
+                                     MensajeConfirmacion="@($"¿Desea hacer admin al usuario {usuario.Email}?")">Hacer admin</BPBoton>
+
+                            <BPBoton OnClick="() => RemoverAdmin(usuario.Email)"
+                                   Variante="Variante.Error"
+                                   MensajeConfirmacion="@($"¿Desea remover como admin al usuario {usuario.Email}?")">Remover admin</BPBoton>
+
+                        </td>
+                        <td>@usuario.Email</td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </HayRegistrosCompleto>
+</ListadoGenerico>
+
+@code {
+    private IEnumerable<UsuarioDTO>? usuarios = null;
+    private int paginaActual = 1;
+    private int registrosPorPagina = 10;
+    private int cantidadTotalRegistros;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await Task.Yield();
+        await Cargar();
+        StateHasChanged();
+    }
+
+    private async Task Cargar(int pagina = 1)
+    {
+        var paginacionDTO = new PaginacionDTO(pagina, registrosPorPagina);
+        var resultadoPaginado = await servicioSeguridad.Obtener(paginacionDTO);
+        usuarios = resultadoPaginado.Elementos;
+        cantidadTotalRegistros = resultadoPaginado.CantidadTotalRegistros;
+    }
+
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await Cargar(pagina);
+    }
+
+    private async Task HacerAdmin(string email)
+    {
+        var resultadoAccion = await servicioSeguridad.HacerAdmin(email);
+
+        if (resultadoAccion == ResultadoAccion.NoTienePermiso)
+        {
+            navigationManager.NavigateTo("forzar-deslogueo");
+        }
+    }
+
+    private async Task RemoverAdmin(string email)
+    {
+        var resultadoAccion = await servicioSeguridad.RemoverAdmin(email);
+    
+        if (resultadoAccion == ResultadoAccion.NoTienePermiso)
+        {
+            navigationManager.NavigateTo("forzar-deslogueo");
+        }
+    }
+
+}

@@ -1,0 +1,82 @@
+﻿@page "/peliculas/editar/{Id:int}"
+@inject NavigationManager navigationManager
+@inject IServicioPeliculas servicioPeliculas
+
+<h3>Editar Película</h3>
+
+@if (pelicula is null)
+{
+    <Cargando />
+} else
+{
+    <FormularioPelicula FormularioPosteadoConExito="formularioPosteadoConExito" 
+        PosteoEnCurso="posteoEnCurso"
+                        FormularioInvalido="false" OnValidSubmit="Editar" Pelicula="pelicula"
+                        GenerosNoSeleccionados="GenerosNoSeleccionados"
+                        GenerosSeleccionados="GenerosSeleccionados"
+                        ActoresSeleccionados="ActoresSeleccionados" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private bool formularioPosteadoConExito = false;
+    private bool posteoEnCurso = false;
+    private Pelicula pelicula = null!;
+
+    private List<Genero> GenerosNoSeleccionados = new List<Genero>();
+    private List<Genero> GenerosSeleccionados = new List<Genero>();
+    private List<Actor> ActoresSeleccionados = [];
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await Task.Yield();
+
+        var modelo = await servicioPeliculas.ObtenerEditarPelicula(Id);
+
+        if (modelo is null)
+        {
+            navigationManager.NavigateTo("/");
+            return;
+        }
+
+        pelicula = modelo.Pelicula;
+        GenerosSeleccionados = modelo.GenerosSeleccionados;
+        GenerosNoSeleccionados = modelo.GenerosNoSeleccionados;
+        ActoresSeleccionados = modelo.Actores;
+        StateHasChanged();
+
+    }
+
+    private async Task Editar()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+            StateHasChanged();
+            await Task.Yield();
+
+            var browserFile = pelicula!.PosterArchivo;
+
+            if (browserFile is not null)
+            {
+                pelicula.Archivo = browserFile.ConvertirAArchivoDTO();
+            }
+
+            await servicioPeliculas.Actualizar(pelicula);
+
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();
+            navigationManager.NavigateTo($"/peliculas/{Id}");
+        }
+    }
+
+
+
+}

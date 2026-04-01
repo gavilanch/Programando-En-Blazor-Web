@@ -1,0 +1,14 @@
+﻿<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="@Id" checked="@Value" 
+    @onchange="OnChanged" />
+    <label class="form-check-label" for="@Id">@Label</label>
+</div>
+
+
+@code {
+    private string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter, EditorRequired] public string Label { get; set; }
+    [Parameter] public bool Value { get; set; }
+    [Parameter] public EventCallback<bool> ValueChanged { get; set; }
+    private Task OnChanged(ChangeEventArgs e) => ValueChanged.InvokeAsync((bool)e.Value!);
+}
