@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BlazorPeliculas.Client/BlazorPeliculas.Client.csproj" Id="928ed265-3a63-4b35-8bab-b588e4730eec" />
+  <Project Path="BlazorPeliculas/BlazorPeliculas.csproj" />
+</Solution>

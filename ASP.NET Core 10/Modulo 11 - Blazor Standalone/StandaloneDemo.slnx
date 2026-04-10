@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ModuloReportes/ModuloReportes.csproj" />
+  <Project Path="StandaloneDemo/StandaloneDemo.csproj" />
+</Solution>

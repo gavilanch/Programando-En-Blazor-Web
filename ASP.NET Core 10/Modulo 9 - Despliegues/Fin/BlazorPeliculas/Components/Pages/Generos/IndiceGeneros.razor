@@ -1,0 +1,90 @@
+﻿@page "/generos"
+@using BlazorPeliculas.DTOs
+@using Microsoft.AspNetCore.Authorization
+@inject IServicioGeneros servicioGeneros
+@attribute [Authorize(Roles = "administrador")]
+
+<h3>Indice Géneros</h3>
+
+<div>
+    <BPLink Href="generos/crear">
+        Crear Género
+    </BPLink>
+</div>
+
+<ListadoGenerico Listado="generos">
+    <HayRegistrosCompleto>
+
+        <Paginacion PaginaActual="paginaActual"
+                    CantidadTotalRegistros="cantidadTotalRegistros"
+                    RegistrosPorPagina="registrosPorPagina" 
+                    PaginaSeleccionada="PaginaSeleccionada"          />
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Nombre</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var genero in generos!)
+                {
+                    <tr @key="genero.Id">
+                        <td>
+                            <BPLink Href="@($"/generos/editar/{genero.Id}")">Editar</BPLink>
+                            <BPBoton OnClick="@(() => BorrarGenero(genero.Id))" 
+                                Variante="Variante.Error"
+                                MensajeConfirmacion="@($"¿Desea borrar el género {genero.Nombre}?")"
+                            >Borrar</BPBoton>
+                        </td>
+                        <td>
+                            @genero.Nombre
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </HayRegistrosCompleto>
+   
+</ListadoGenerico>
+
+@code {
+    private IEnumerable<Genero>? generos = null;
+    private int paginaActual = 1;
+    private int registrosPorPagina = 10;
+    private int cantidadTotalRegistros;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await Task.Yield();
+        await Cargar();
+        StateHasChanged();
+    }
+
+    private async Task Cargar(int pagina = 1)
+    {
+        var paginacionDTO = new PaginacionDTO(pagina, registrosPorPagina);
+        var resultadoPaginado = await servicioGeneros.Obtener(paginacionDTO);
+        generos = resultadoPaginado.Elementos;
+        cantidadTotalRegistros = resultadoPaginado.CantidadTotalRegistros;
+    }
+
+    private async Task PaginaSeleccionada(int pagina)
+    {
+        paginaActual = pagina;
+        await Cargar(pagina);
+    }
+
+    private async Task BorrarGenero(int id)
+    {
+        await servicioGeneros.Borrar(id);
+        await Cargar();
+    }
+}

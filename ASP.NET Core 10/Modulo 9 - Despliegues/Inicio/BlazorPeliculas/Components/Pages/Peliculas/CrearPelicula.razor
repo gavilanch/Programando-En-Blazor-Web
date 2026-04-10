@@ -1,0 +1,74 @@
+﻿@page "/peliculas/crear"
+
+@inject NavigationManager navigationManager
+@inject IServicioGeneros servicioGeneros
+@inject IServicioPeliculas servicioPeliculas
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "administrador")]
+
+<h3>Crear Película</h3>
+
+@if (GenerosNoSeleccionados is null)
+{
+    <Cargando />
+} else
+{
+    <FormularioPelicula FormularioPosteadoConExito="formularioPosteadoConExito"
+                        PosteoEnCurso="posteoEnCurso"
+                        OnValidSubmit="Crear" Pelicula="pelicula"
+                        GenerosNoSeleccionados="GenerosNoSeleccionados" />
+}
+
+
+
+
+@code {
+
+    private bool formularioPosteadoConExito = false;
+    private bool posteoEnCurso = false;
+    private Pelicula pelicula = null!;
+    private List<Genero>? GenerosNoSeleccionados = null;
+
+    protected override void OnInitialized()
+    {
+        pelicula = new();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var generos = await servicioGeneros.ObtenerTodos();
+        GenerosNoSeleccionados = generos.ToList();
+        StateHasChanged();
+    }
+
+
+    private async Task Crear()
+    {
+        if (!posteoEnCurso)
+        {
+            posteoEnCurso = true;
+            
+            StateHasChanged();
+            await Task.Yield();
+
+            var browserFile = pelicula.PosterArchivo;
+
+            if (browserFile is not null)
+            {
+                pelicula.Archivo = browserFile.ConvertirAArchivoDTO();
+            }
+
+            var id = await servicioPeliculas.Crear(pelicula);
+
+            posteoEnCurso = false;
+            formularioPosteadoConExito = true;
+            StateHasChanged();
+            navigationManager.NavigateTo($"/peliculas/{id}");
+        }
+    }
+}

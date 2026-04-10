@@ -1,0 +1,18 @@
+﻿@using System.Linq.Expressions
+<div class="mb-3">
+    <label for="@Id">@Label:</label>
+    <div>
+        <InputText class="form-control" Value="@Value" ValueChanged="ValueChanged"
+            ValueExpression="ValueExpression" autocomplete="off" id="@Id"
+        />
+        <ValidationMessage For="ValueExpression" />
+    </div>
+</div>
+
+@code {
+    private string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter, EditorRequired] public string Label { get; set; }
+    [Parameter] public string Value { get; set; } = null!;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public Expression<Func<string>> ValueExpression { get; set; } = null!;
+}

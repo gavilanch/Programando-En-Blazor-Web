@@ -1,0 +1,29 @@
+﻿@page "/"
+@page "/index"
+@attribute [StreamRendering]
+@inject IServicioPeliculas servicioPeliculas
+
+<PageTitle>Home</PageTitle>
+
+<h3>En Cartelera</h3>
+<ListadoPeliculas Peliculas="_homeDTO.EnCartelera" />
+
+<h3>Futuros Estrenos</h3>
+<ListadoPeliculas Peliculas="_homeDTO.FuturosEstrenos" />
+
+@code {
+    private HomeDTO _homeDTO = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await Task.Yield();
+
+        _homeDTO = await servicioPeliculas.ObtenerPeliculasHome();
+        StateHasChanged();
+    }
+}

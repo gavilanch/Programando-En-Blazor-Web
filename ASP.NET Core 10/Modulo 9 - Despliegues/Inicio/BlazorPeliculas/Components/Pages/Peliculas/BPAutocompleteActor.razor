@@ -1,0 +1,97 @@
+﻿@inject IServicioActores servicioActores
+
+<div class="mb-3">
+    <label>Actores:</label>
+    <div>
+        <MudAutocomplete T="Actor" Placeholder="Seleccione un actor..."
+                         SearchFunc="Search" ToStringFunc="@(e=> null)"
+                         Value="actorSeleccionado" ValueChanged="ValueChanged"
+                        @ref="mudAutoComplete" >
+            <ItemTemplate Context="actor">
+                <img style="width: 50px" src="@actor.FotoURL" /> @actor.Nombre
+            </ItemTemplate>
+        </MudAutocomplete>
+
+        <ul class="list-group">
+            @foreach (var item in ActoresSeleccionados)
+            {
+                <li draggable="true" 
+                    @ondragstart="@(() => HandleDragStart(item))"
+                    @ondragover="@(() => HandleDragOver(item))"
+                    class="list-group-item list-group-item-action">
+                    @item.Nombre / <input type="text" placeholder="Personaje" @bind="item.Personaje" />
+
+                    <span @onclick="@(() => ActoresSeleccionados.Remove(item))"
+                          class="badge bg-primary rounded-pill" style="cursor:pointer">
+                        X
+                    </span>
+
+
+                </li>
+            }
+        </ul>
+
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public List<Actor> ActoresSeleccionados { get; set; } = [];
+    Actor? actorSeleccionado;
+    private MudAutocomplete<Actor>? mudAutoComplete;
+    Actor? itemArrastrado;
+
+    private async Task<IEnumerable<Actor>> Search(string value,
+            CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return new List<Actor>();
+        }
+
+        var actores = await servicioActores.ObtenerPorNombre(value);
+        return actores;
+
+    }
+
+    async Task ValueChanged(Actor actor)
+    {
+
+        if (actor is null)
+        {
+            return;
+        }
+
+        if (!ActoresSeleccionados.Any(x => x!.Equals(actor)))
+        {
+            ActoresSeleccionados.Add(actor);
+        }
+
+        actorSeleccionado = null;
+
+        await mudAutoComplete!.ClearAsync();
+    }
+
+    private void HandleDragStart(Actor item)
+    {
+        itemArrastrado = item;
+    }
+
+    private void HandleDragOver(Actor item)
+    {
+        if (itemArrastrado is null)
+        {
+            return;
+        }
+
+
+        if (!item!.Equals(itemArrastrado))
+        {
+            var indiceElementoArrastrado = ActoresSeleccionados.IndexOf(itemArrastrado);
+            var indiceElemento = ActoresSeleccionados.IndexOf(item);
+            ActoresSeleccionados[indiceElemento] = itemArrastrado;
+            ActoresSeleccionados[indiceElementoArrastrado] = item;
+
+        }
+    }
+}

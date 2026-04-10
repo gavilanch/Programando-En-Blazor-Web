@@ -1,0 +1,32 @@
+﻿@page "/crearPersona"
+@using Comun
+@using PWABlazor.Servicios
+@inject IServicioPersonas servicioPersona
+
+<h3>Crear Persona</h3>
+
+<div class="mb-3">
+    <label>Nombre</label>
+    <input class="form-control" @bind="modelo.Nombre" />
+</div>
+
+<button class="btn btn-primary" @onclick="Guardar">Guardar</button>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info mt-3">@mensaje</div>
+}
+
+
+
+@code {
+    private CrearPersonaDTO modelo = new();
+    private string? mensaje;
+
+    private async Task Guardar()
+    {
+        await servicioPersona.CrearPersona(modelo);
+        mensaje = "Si hay internet, se envió al servidor. Si no, quedó pendiente para sincronizar.";
+        modelo = new CrearPersonaDTO();
+    }
+}

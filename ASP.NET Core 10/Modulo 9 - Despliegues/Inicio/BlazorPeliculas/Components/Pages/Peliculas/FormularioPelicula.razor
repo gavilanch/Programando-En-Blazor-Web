@@ -1,0 +1,59 @@
+﻿@using BlazorPeliculas.Components.Compartidos.SelectorMultiple
+<FormularioEntidad Entidad="Pelicula" FormularioPosteadoConExito="FormularioPosteadoConExito"
+                   PosteoEnCurso="PosteoEnCurso"
+                   OnValidSubmit="PosteoFormulario" FormularioInvalido="FormularioInvalido"
+DestinoCancelar="/peliculas/buscar"
+>
+    <BPInputText Label="Título" @bind-Value="@Pelicula.Titulo" />
+    <BPInputText Label="Trailer" @bind-Value="@Pelicula.Trailer" />
+    <BPInputDate Label="Fecha de Lanzamiento" @bind-Value="@Pelicula.FechaLanzamiento" />
+    <BPCheckbox Label="En Cartelera" @bind-Value="@Pelicula.EnCartelera" />
+    <InputImg Label="Poster" ImagenSeleccionada="archivo => Pelicula.PosterArchivo = archivo"
+              ImagenURL="@Pelicula.PosterURL" />
+
+    <SelectorMultiple Label="Géneros" Seleccionados="Seleccionados"
+                      NoSeleccionados="NoSeleccionados" />
+
+    <BPAutocompleteActor ActoresSeleccionados="ActoresSeleccionados" />
+
+</FormularioEntidad>
+
+@code {
+    [Parameter] public List<Actor> ActoresSeleccionados { get; set; } = [];
+    [Parameter] public List<Genero> GenerosSeleccionados { get; set; } = [];
+    [Parameter, EditorRequired] public List<Genero> GenerosNoSeleccionados { get; set; } = [];
+    [Parameter, EditorRequired] public Pelicula Pelicula { get; set; } = null!;
+    [Parameter, EditorRequired] public bool FormularioPosteadoConExito { get; set; } = false;
+    [Parameter, EditorRequired] public bool PosteoEnCurso { get; set; } = false;
+    [Parameter, EditorRequired] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public bool FormularioInvalido { get; set; } = true;
+
+    private List<SelectorMultipleModelo> Seleccionados { get; set; } = [];
+    private List<SelectorMultipleModelo> NoSeleccionados { get; set; } = [];
+
+
+    protected override void OnInitialized()
+    {
+        Seleccionados = GenerosSeleccionados.Select(x =>
+            new SelectorMultipleModelo(x.Id.ToString(), x.Nombre!)).ToList();
+
+        NoSeleccionados = GenerosNoSeleccionados.Select(x =>
+       new SelectorMultipleModelo(x.Id.ToString(), x.Nombre!)).ToList();
+    }
+
+    private async Task PosteoFormulario()
+    {
+        Pelicula.GenerosPelicula = Seleccionados
+            .Select(x => new GeneroPelicula { GeneroId = int.Parse(x.Identificador) }).ToList();
+
+        Pelicula.ActoresPelicula = ActoresSeleccionados
+        .Select((actor, indice) => new ActorPelicula
+            {
+                ActorId = actor.Id,
+                Personaje = actor.Personaje,
+                Orden = indice
+            }).ToList();
+
+        await OnValidSubmit.InvokeAsync();
+    }
+}

@@ -1,0 +1,43 @@
+﻿@inject NavigationManager navigationManager
+@inject IJSRuntime JS
+
+@if (mostrar)
+{
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <span>Hay una nueva versión disponible</span>
+        <button class="btn btn-primary" @onclick="Actualizar">
+            Actualizar
+        </button>
+    </div>
+}
+
+@code {
+    private bool mostrar;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await JS.InvokeVoidAsync("configurarRevisionActualizacionPWA",
+    DotNetObjectReference.Create(this));
+
+    }
+
+    [JSInvokable]
+    public void NuevaVersionDisponible()
+    {
+        mostrar = true;
+        StateHasChanged();
+    }
+
+    private async Task Actualizar()
+    {
+        await JS.InvokeVoidAsync("actualizarPWA");
+        navigationManager.NavigateTo(navigationManager.Uri, forceLoad: true);
+    }
+
+
+}

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="API/API.csproj" />
+  <Project Path="Comun/Comun.csproj" />
+  <Project Path="PWABlazor/PWABlazor.csproj" />
+</Solution>
